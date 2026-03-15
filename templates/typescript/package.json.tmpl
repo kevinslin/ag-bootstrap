@@ -1,0 +1,25 @@
+{
+  "name": "{{package_name}}",
+  "version": "0.1.0",
+  "description": "{{description}}",
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@10.28.1",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "tsc -p tsconfig.json",
+    "prepare": "husky",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "husky": "^9.1.7",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

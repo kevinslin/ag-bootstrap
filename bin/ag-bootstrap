@@ -1,0 +1,243 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+TEMPLATES_ROOT = REPO_ROOT / "templates"
+PLACEHOLDER_PATTERN = re.compile(r"{{\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*}}")
+
+
+def fail(message: str) -> None:
+    print(f"Error: {message}", file=sys.stderr)
+    raise SystemExit(1)
+
+
+def run(command: list[str], cwd: Path) -> None:
+    subprocess.run(command, cwd=cwd, check=True)
+
+
+def available_templates() -> list[str]:
+    if not TEMPLATES_ROOT.exists():
+        return []
+    return sorted(path.name for path in TEMPLATES_ROOT.iterdir() if path.is_dir())
+
+
+def sanitize_package_name(project_name: str) -> str:
+    cleaned = re.sub(r"[^a-z0-9]+", "-", project_name.lower()).strip("-")
+    return cleaned or "typescript-project"
+
+
+def parse_extra_vars(values: list[str]) -> dict[str, str]:
+    result: dict[str, str] = {}
+    for value in values:
+        if "=" not in value:
+            fail(f"invalid --var value {value!r}; expected key=value")
+        key, raw = value.split("=", 1)
+        key = key.strip()
+        if not key:
+            fail(f"invalid --var value {value!r}; key cannot be empty")
+        result[key] = raw
+    return result
+
+
+def render_text(text: str, context: dict[str, str], path: Path) -> str:
+    def replace(match: re.Match[str]) -> str:
+        key = match.group(1)
+        if key not in context:
+            fail(f"missing template variable {key!r} while rendering {path}")
+        return context[key]
+
+    return PLACEHOLDER_PATTERN.sub(replace, text)
+
+
+def render_template(template_name: str, destination: Path, context: dict[str, str]) -> None:
+    template_root = TEMPLATES_ROOT / template_name
+    if not template_root.is_dir():
+        fail(
+            f"unknown template {template_name!r}; supported types: {', '.join(available_templates()) or 'none'}"
+        )
+
+    if destination.exists():
+        if not destination.is_dir():
+            fail(f"destination exists and is not a directory: {destination}")
+        if any(destination.iterdir()):
+            fail(f"destination must be empty: {destination}")
+    else:
+        destination.mkdir(parents=True)
+
+    for source in sorted(template_root.rglob("*")):
+        relative = source.relative_to(template_root)
+        target_relative = Path(str(relative).removesuffix(".tmpl"))
+        target = destination / target_relative
+
+        if source.is_dir():
+            target.mkdir(parents=True, exist_ok=True)
+            continue
+
+        target.parent.mkdir(parents=True, exist_ok=True)
+        rendered = render_text(source.read_text(encoding="utf-8"), context, source)
+        target.write_text(rendered, encoding="utf-8")
+
+
+def ensure_pnpm() -> None:
+    if not shutil_which("pnpm"):
+        fail("pnpm is not installed. Install with: corepack enable pnpm")
+
+
+def ensure_git() -> None:
+    if not shutil_which("git"):
+        fail("git is not installed")
+
+
+def shutil_which(command: str) -> str | None:
+    for directory in os.environ.get("PATH", "").split(os.pathsep):
+        candidate = Path(directory) / command
+        if candidate.is_file() and os.access(candidate, os.X_OK):
+            return str(candidate)
+    return None
+
+
+def run_followup(destination: Path) -> None:
+    ensure_pnpm()
+    run(["pnpm", "install"], cwd=destination)
+    run(["pnpm", "test"], cwd=destination)
+
+    if not (destination / ".git").is_dir():
+        ensure_git()
+        run(["git", "init"], cwd=destination)
+        run(["pnpm", "prepare"], cwd=destination)
+
+
+def detect_package_manager(root: Path) -> tuple[str, str]:
+    if (root / "pnpm-lock.yaml").exists():
+        return ("pnpm", "pnpm install")
+    if (root / "yarn.lock").exists():
+        return ("yarn", "yarn install")
+    if (root / "bun.lockb").exists():
+        return ("bun run", "bun install")
+    package_json = root / "package.json"
+    if package_json.is_file():
+        data = json.loads(package_json.read_text(encoding="utf-8"))
+        package_manager = str(data.get("packageManager", ""))
+        if package_manager.startswith("pnpm@"):
+            return ("pnpm", "pnpm install")
+        if package_manager.startswith("yarn@"):
+            return ("yarn", "yarn install")
+        if package_manager.startswith("bun@"):
+            return ("bun run", "bun install")
+    return ("npm run", "npm install")
+
+
+def add_precommit(root: Path) -> None:
+    package_json = root / "package.json"
+    if not package_json.is_file():
+        fail(f"package.json not found at {package_json}")
+
+    data = json.loads(package_json.read_text(encoding="utf-8"))
+    scripts = data.get("scripts", {})
+    missing = [name for name in ("lint", "format") if name not in scripts]
+    if missing:
+        fail(f"missing scripts in package.json: {', '.join(missing)}")
+
+    run_cmd, install_cmd = detect_package_manager(root)
+    husky_dir = root / ".husky"
+    husky_dir.mkdir(parents=True, exist_ok=True)
+
+    precommit = husky_dir / "pre-commit"
+    precommit.write_text(
+        "#!/bin/sh\n"
+        '. "$(dirname "$0")/_/husky.sh"\n'
+        "\n"
+        f"{run_cmd} lint\n"
+        f"{run_cmd} format\n",
+        encoding="utf-8",
+    )
+    precommit.chmod(0o755)
+
+    if not (husky_dir / "_" / "husky.sh").is_file():
+        print(
+            f'Note: husky is not installed. Run "{install_cmd}" or "npx husky install" to enable hooks.',
+            file=sys.stderr,
+        )
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(prog="ag-bootstrap")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    subparsers.add_parser("list", help="List supported project templates")
+
+    bootstrap_parser = subparsers.add_parser("bootstrap", help="Render a project template")
+    bootstrap_parser.add_argument("template", help="Project type to bootstrap")
+    bootstrap_parser.add_argument("target_dir", help="Destination directory")
+    bootstrap_parser.add_argument("--project-name", help="Human-friendly project name")
+    bootstrap_parser.add_argument("--package-name", help="Package name for generated files")
+    bootstrap_parser.add_argument(
+        "--description",
+        default="Project bootstrapped from ag-bootstrap",
+        help="Project description",
+    )
+    bootstrap_parser.add_argument(
+        "--var",
+        action="append",
+        default=[],
+        help="Extra template variable in key=value form",
+    )
+    bootstrap_parser.add_argument(
+        "--skip-followup",
+        "--no-followup",
+        action="store_true",
+        help="Render files only; skip install, test, and git init follow-up",
+    )
+
+    add_precommit_parser = subparsers.add_parser(
+        "add-precommit", help="Install the standard Husky pre-commit hook"
+    )
+    add_precommit_parser.add_argument("project_root", nargs="?", default=".")
+
+    return parser
+
+
+def main() -> int:
+    parser = build_parser()
+    args = parser.parse_args()
+
+    if args.command == "list":
+        for template_name in available_templates():
+            print(template_name)
+        return 0
+
+    if args.command == "bootstrap":
+        destination = Path(args.target_dir).expanduser().resolve()
+        project_name = args.project_name or destination.name
+        package_name = args.package_name or sanitize_package_name(project_name)
+        context = {
+            "project_name": project_name,
+            "package_name": package_name,
+            "description": args.description,
+        }
+        context.update(parse_extra_vars(args.var))
+        render_template(args.template, destination, context)
+        add_precommit(destination)
+        if not args.skip_followup:
+            run_followup(destination)
+        return 0
+
+    if args.command == "add-precommit":
+        add_precommit(Path(args.project_root).expanduser().resolve())
+        return 0
+
+    parser.error(f"unknown command: {args.command}")
+    return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
