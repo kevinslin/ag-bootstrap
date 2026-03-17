@@ -2,15 +2,15 @@
 
 Bootstrap project skeletons from local templates.
 
-`ag-bootstrap` is intentionally small:
+`ag-bootstrap` keeps the bootstrap logic small and reusable:
 
 - Templates live in `./templates/<project-type>`.
-- The CLI renders template files in place.
-- Skills can call the same CLI instead of duplicating bootstrap logic.
+- The CLI renders template files into a destination directory.
+- Skills can call the same CLI instead of re-implementing scaffold logic.
 
-For now, only one project type is supported:
+For now, one project type is supported:
 
-- `typescript`
+- `typescript`: a pnpm monorepo with Lerna, Nx, Jest, ESLint, Prettier, Husky, GitHub Actions, and AGD starter docs.
 
 ## Layout
 
@@ -31,32 +31,32 @@ List available project types:
 ./bin/ag-bootstrap list
 ```
 
-Bootstrap a TypeScript project:
+Bootstrap the TypeScript monorepo template:
 
 ```bash
-./bin/ag-bootstrap bootstrap typescript ~/code/example-ts
+./bin/ag-bootstrap bootstrap typescript ~/code/example-monorepo
 ```
 
 Skip install and test follow-up:
 
 ```bash
-./bin/ag-bootstrap bootstrap typescript ~/code/example-ts --skip-followup
+./bin/ag-bootstrap bootstrap typescript ~/code/example-monorepo --skip-followup
 ```
 
 Override template variables:
 
 ```bash
-./bin/ag-bootstrap bootstrap typescript ~/code/example-ts \
-  --project-name "Example TS" \
-  --package-name example-ts \
-  --description "Example project" \
+./bin/ag-bootstrap bootstrap typescript ~/code/example-monorepo \
+  --project-name "Example Monorepo" \
+  --package-name example-monorepo \
+  --description "Example pnpm monorepo" \
   --var author="Kevin Lin"
 ```
 
-Add a Husky pre-commit hook to an existing project:
+Install the standard Husky hooks in an existing project:
 
 ```bash
-./bin/ag-bootstrap add-precommit ~/code/example-ts
+./bin/ag-bootstrap add-precommit ~/code/example-monorepo
 ```
 
 ## Template Variables
@@ -65,6 +65,7 @@ Every template currently receives these variables:
 
 - `project_name`
 - `package_name`
+- `package_scope`
 - `description`
 
 Extra values can be passed with repeated `--var key=value`.
@@ -76,7 +77,7 @@ Extra values can be passed with repeated `--var key=value`.
 1. `pnpm install`
 2. `pnpm test`
 3. `git init` when the target is not already a git repo
-4. write the standard `.husky/pre-commit` hook
+4. write the standard `.husky/pre-commit` and `.husky/pre-push` hooks
 5. `pnpm prepare` after `git init` so Husky hooks activate
 
 Pass `--skip-followup` to only render files.

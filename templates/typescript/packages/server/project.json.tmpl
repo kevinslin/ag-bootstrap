@@ -1,0 +1,27 @@
+{
+  "name": "server",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/server/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "command": "pnpm --dir packages/server build"
+    },
+    "clean": {
+      "command": "pnpm --dir packages/server clean"
+    },
+    "dev": {
+      "command": "pnpm --dir packages/server dev"
+    },
+    "format": {
+      "command": "pnpm --dir packages/server format"
+    },
+    "lint": {
+      "command": "pnpm --dir packages/server lint"
+    },
+    "test": {
+      "command": "pnpm --dir packages/server test"
+    }
+  },
+  "tags": ["scope:server"]
+}

@@ -1,0 +1,27 @@
+{
+  "name": "client",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/client/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "command": "pnpm --dir packages/client build"
+    },
+    "clean": {
+      "command": "pnpm --dir packages/client clean"
+    },
+    "dev": {
+      "command": "pnpm --dir packages/client dev"
+    },
+    "format": {
+      "command": "pnpm --dir packages/client format"
+    },
+    "lint": {
+      "command": "pnpm --dir packages/client lint"
+    },
+    "test": {
+      "command": "pnpm --dir packages/client test"
+    }
+  },
+  "tags": ["scope:client"]
+}

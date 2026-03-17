@@ -1,0 +1,27 @@
+{
+  "name": "scripts",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/scripts/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "command": "pnpm --dir packages/scripts build"
+    },
+    "clean": {
+      "command": "pnpm --dir packages/scripts clean"
+    },
+    "dev": {
+      "command": "pnpm --dir packages/scripts dev"
+    },
+    "format": {
+      "command": "pnpm --dir packages/scripts format"
+    },
+    "lint": {
+      "command": "pnpm --dir packages/scripts lint"
+    },
+    "test": {
+      "command": "pnpm --dir packages/scripts test"
+    }
+  },
+  "tags": ["scope:scripts"]
+}

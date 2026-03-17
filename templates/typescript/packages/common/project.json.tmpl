@@ -1,0 +1,27 @@
+{
+  "name": "common",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/common/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "command": "pnpm --dir packages/common build"
+    },
+    "clean": {
+      "command": "pnpm --dir packages/common clean"
+    },
+    "dev": {
+      "command": "pnpm --dir packages/common dev"
+    },
+    "format": {
+      "command": "pnpm --dir packages/common format"
+    },
+    "lint": {
+      "command": "pnpm --dir packages/common lint"
+    },
+    "test": {
+      "command": "pnpm --dir packages/common test"
+    }
+  },
+  "tags": ["scope:common"]
+}

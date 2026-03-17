@@ -1,0 +1,7 @@
+import { createConnectionString } from "../src"
+
+describe("db", () => {
+  it("builds a predictable connection string", () => {
+    expect(createConnectionString("service")).toBe("postgres://localhost:5432/service")
+  })
+})

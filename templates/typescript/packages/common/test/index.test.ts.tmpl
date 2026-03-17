@@ -1,0 +1,11 @@
+import { formatGreeting, formatPackageLabel } from "../src"
+
+describe("common", () => {
+  it("formats greetings", () => {
+    expect(formatGreeting("world")).toBe("Hello, world!")
+  })
+
+  it("formats package labels", () => {
+    expect(formatPackageLabel("client")).toBe("package:client")
+  })
+})

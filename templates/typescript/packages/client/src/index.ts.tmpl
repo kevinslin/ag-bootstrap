@@ -1,0 +1,7 @@
+export function renderHelloWorld(name = "world"): string {
+  return `Hello, ${name}!`
+}
+
+if (require.main === module) {
+  console.log(renderHelloWorld())
+}

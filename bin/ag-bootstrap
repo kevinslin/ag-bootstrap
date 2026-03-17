@@ -35,6 +35,13 @@ def sanitize_package_name(project_name: str) -> str:
     return cleaned or "typescript-project"
 
 
+def derive_package_scope(package_name: str) -> str:
+    normalized = package_name.strip()
+    if normalized.startswith("@") and "/" in normalized:
+        return normalized[1:].split("/", 1)[0]
+    return sanitize_package_name(normalized.removeprefix("@"))
+
+
 def parse_extra_vars(values: list[str]) -> dict[str, str]:
     result: dict[str, str] = {}
     for value in values:
@@ -162,6 +169,23 @@ def add_precommit(root: Path) -> None:
     )
     precommit.chmod(0o755)
 
+    prepush_commands = []
+    if "format:check" in scripts:
+        prepush_commands.append(f"{run_cmd} format:check")
+    else:
+        prepush_commands.append(f"{run_cmd} format")
+
+    prepush = husky_dir / "pre-push"
+    prepush.write_text(
+        "#!/bin/sh\n"
+        '. "$(dirname "$0")/_/husky.sh"\n'
+        "\n"
+        + "\n".join(prepush_commands)
+        + "\n",
+        encoding="utf-8",
+    )
+    prepush.chmod(0o755)
+
     if not (husky_dir / "_" / "husky.sh").is_file():
         print(
             f'Note: husky is not installed. Run "{install_cmd}" or "npx husky install" to enable hooks.',
@@ -199,7 +223,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     add_precommit_parser = subparsers.add_parser(
-        "add-precommit", help="Install the standard Husky pre-commit hook"
+        "add-precommit", help="Install the standard Husky hooks"
     )
     add_precommit_parser.add_argument("project_root", nargs="?", default=".")
 
@@ -222,6 +246,7 @@ def main() -> int:
         context = {
             "project_name": project_name,
             "package_name": package_name,
+            "package_scope": derive_package_scope(package_name),
             "description": args.description,
         }
         context.update(parse_extra_vars(args.var))

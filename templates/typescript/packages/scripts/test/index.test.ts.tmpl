@@ -1,0 +1,8 @@
+import { listManagedPackages } from "../src"
+
+describe("scripts", () => {
+  it("lists every managed package", () => {
+    expect(listManagedPackages()).toContain("package:server")
+    expect(listManagedPackages()).toHaveLength(6)
+  })
+})

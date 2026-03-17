@@ -5,8 +5,10 @@
     "outDir": "dist",
     "rootDir": "src",
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "sourceMap": true,
+    "tsBuildInfoFile": "tsconfig.tsbuildinfo"
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["tests/**/*.ts", "dist", "node_modules"]
+  "exclude": ["test/**/*.ts", "dist", "coverage", "node_modules"]
 }

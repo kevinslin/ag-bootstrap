@@ -1,0 +1,10 @@
+# Memory
+
+## Stable Decisions
+
+- The repository is a pnpm workspace with packages under `packages/`
+- Lerna coordinates common package lifecycle scripts
+- Nx runs cached lint and test targets across the workspace
+- Shared TypeScript settings live in the root `tsconfig.json`
+- Unit tests stay close to each package under `test/`
+- Integration coverage lives in `packages/integration/test/`

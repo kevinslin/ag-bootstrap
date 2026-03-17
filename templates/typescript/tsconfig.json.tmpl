@@ -1,15 +1,24 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "types": ["node", "vitest/globals"],
-    "noEmit": true
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "types": ["node", "jest"],
+    "paths": {
+      "@{{package_scope}}/client": ["packages/client/src/index.ts"],
+      "@{{package_scope}}/common": ["packages/common/src/index.ts"],
+      "@{{package_scope}}/db": ["packages/db/src/index.ts"],
+      "@{{package_scope}}/integration": ["packages/integration/src/index.ts"],
+      "@{{package_scope}}/scripts": ["packages/scripts/src/index.ts"],
+      "@{{package_scope}}/server": ["packages/server/src/index.ts"]
+    }
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts"],
-  "exclude": ["dist", "node_modules"]
+  "exclude": ["**/dist/**", "**/coverage/**", "node_modules"]
 }

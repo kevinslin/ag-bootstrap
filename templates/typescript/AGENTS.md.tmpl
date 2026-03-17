@@ -1,0 +1,23 @@
+# Agent Notes
+
+## Project Layout
+
+- Durable planning docs live at the repo root: `design.md`, `memory.md`, `config.md`, `progress.md`, and `docs/`
+- Runtime agent notes belong under `.agents/runs/`
+- Workspace packages live under `packages/`
+- Unit tests live in each package `test/` directory
+- Cross-package integration tests live in `packages/integration/test/`
+
+## Engineering Rules
+
+- Extend the root `tsconfig.json` by default
+- Keep shared utilities and types in `packages/common`
+- Keep `build`, `dev`, `clean`, and `format` scripts aligned across packages
+- Run repo-wide workflows from the root with `pnpm`
+
+## Delivery Checklist
+
+- update `design.md` when architecture changes
+- capture durable decisions in `memory.md`
+- keep `progress.md` current with active milestones and blockers
+- move completed work items from `docs/` into `docs/.archive/` when they are finished

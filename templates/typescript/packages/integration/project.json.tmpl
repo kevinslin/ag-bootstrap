@@ -1,0 +1,27 @@
+{
+  "name": "integration",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/integration/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "command": "pnpm --dir packages/integration build"
+    },
+    "clean": {
+      "command": "pnpm --dir packages/integration clean"
+    },
+    "dev": {
+      "command": "pnpm --dir packages/integration dev"
+    },
+    "format": {
+      "command": "pnpm --dir packages/integration format"
+    },
+    "lint": {
+      "command": "pnpm --dir packages/integration lint"
+    },
+    "test": {
+      "command": "pnpm --dir packages/integration test"
+    }
+  },
+  "tags": ["scope:integration"]
+}

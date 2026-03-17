@@ -1,0 +1,15 @@
+{
+  "name": "@{{package_scope}}/db",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "clean": "rimraf dist coverage tsconfig.tsbuildinfo src/**/*.d.ts src/**/*.d.ts.map src/**/*.js src/**/*.js.map",
+    "dev": "tsc -w -p tsconfig.build.json",
+    "format": "prettier --write .",
+    "lint": "eslint . --max-warnings=0",
+    "test": "jest --config ../../jest.config.cjs --selectProjects db --runInBand"
+  }
+}

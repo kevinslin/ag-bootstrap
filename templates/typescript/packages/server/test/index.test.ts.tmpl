@@ -1,0 +1,8 @@
+import { buildServerBanner } from "../src"
+
+describe("server", () => {
+  it("builds a banner using common and db utilities", () => {
+    expect(buildServerBanner("world")).toContain("Hello, world!")
+    expect(buildServerBanner("world")).toContain("postgres://localhost:5432/service")
+  })
+})

@@ -1,0 +1,27 @@
+{
+  "name": "db",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/db/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "command": "pnpm --dir packages/db build"
+    },
+    "clean": {
+      "command": "pnpm --dir packages/db clean"
+    },
+    "dev": {
+      "command": "pnpm --dir packages/db dev"
+    },
+    "format": {
+      "command": "pnpm --dir packages/db format"
+    },
+    "lint": {
+      "command": "pnpm --dir packages/db lint"
+    },
+    "test": {
+      "command": "pnpm --dir packages/db test"
+    }
+  },
+  "tags": ["scope:db"]
+}

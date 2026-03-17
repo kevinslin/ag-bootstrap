@@ -2,9 +2,56 @@
 
 {{description}}
 
-## Scripts
+This template bootstraps a pnpm monorepo managed with Lerna and Nx. It includes:
 
-- `pnpm build`
-- `pnpm lint`
-- `pnpm format`
-- `pnpm test`
+- shared TypeScript configuration at the repository root
+- Jest for unit and integration testing
+- ESLint and Prettier for linting and formatting
+- Husky hooks for local guardrails
+- GitHub Actions for CI
+- AGD starter docs for design, memory, config, and progress tracking
+
+## Layout
+
+```text
+.
+├── AGENTS.md
+├── README.md
+├── config.md
+├── design.md
+├── docs/
+│   ├── .archive/
+│   └── spec-01-monorepo-foundation.md
+├── memory.md
+├── progress.md
+├── packages/
+│   ├── client/
+│   ├── common/
+│   ├── db/
+│   ├── integration/
+│   ├── scripts/
+│   └── server/
+└── tsconfig.json
+```
+
+## Commands
+
+- `pnpm build`: build every workspace package through Lerna
+- `pnpm dev`: run package watch tasks in parallel
+- `pnpm clean`: remove build output and Nx cache artifacts
+- `pnpm format`: format the repo with Prettier
+- `pnpm lint`: lint every package through Nx
+- `pnpm test`: run unit and integration tests through Nx and Jest
+
+## Testing Conventions
+
+- Unit tests live in `packages/*/test`
+- Cross-package integration tests live in `packages/integration/test`
+
+## Getting Started
+
+```bash
+pnpm install
+pnpm build
+pnpm test
+```

@@ -1,0 +1,18 @@
+# Spec 01: Monorepo Foundation
+
+## Objective
+
+Stand up a TypeScript monorepo with clear package boundaries, shared tooling, and a predictable place for unit and integration tests.
+
+## Scope
+
+- configure `pnpm`, `lerna`, and `nx`
+- centralize TypeScript settings at the repo root
+- add package scaffolds for `common`, `server`, `client`, `db`, `integration`, and `scripts`
+- enable `jest`, `eslint`, `prettier`, Husky, and GitHub Actions
+
+## Exit Criteria
+
+- every package exposes starter source and tests
+- root scripts cover build, dev, clean, format, lint, and test flows
+- CI runs successfully with the standard workspace commands

@@ -1,0 +1,32 @@
+const { pathsToModuleNameMapper } = require("ts-jest")
+const { compilerOptions } = require("./tsconfig.json")
+
+const rootDir = __dirname
+const packageNames = ["common", "server", "client", "db", "scripts", "integration"]
+
+module.exports = {
+  projects: packageNames.map((packageName) => ({
+    displayName: packageName,
+    rootDir,
+    preset: "ts-jest",
+    testEnvironment: "node",
+    moduleFileExtensions: ["ts", "js", "json"],
+    moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
+      prefix: "<rootDir>/",
+    }),
+    testMatch: [
+      packageName === "integration"
+        ? "<rootDir>/packages/integration/test/**/*.test.ts"
+        : `<rootDir>/packages/${packageName}/test/**/*.test.ts`,
+    ],
+    collectCoverageFrom: [`<rootDir>/packages/${packageName}/src/**/*.ts`],
+    transform: {
+      "^.+\\.ts$": [
+        "ts-jest",
+        {
+          tsconfig: "<rootDir>/tsconfig.json",
+        },
+      ],
+    },
+  })),
+}

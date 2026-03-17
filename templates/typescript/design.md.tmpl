@@ -1,0 +1,22 @@
+# Design
+
+## Goal
+
+Provide a TypeScript monorepo foundation with shared tooling, predictable package structure, and room for both application code and durable agent documentation.
+
+## Architecture
+
+- `packages/common`: shared utilities and types
+- `packages/server`: server-side application code
+- `packages/client`: client-facing application code
+- `packages/db`: database access primitives
+- `packages/scripts`: automation and maintenance helpers
+- `packages/integration`: cross-package integration checks
+
+## Tooling
+
+- `pnpm` manages dependencies and workspace linking
+- `lerna` runs package scripts across the workspace
+- `nx` provides task graph execution for linting and testing
+- `jest` runs unit and integration tests
+- `eslint` and `prettier` enforce code quality and formatting

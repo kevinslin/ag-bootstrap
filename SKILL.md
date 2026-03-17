@@ -1,6 +1,6 @@
 ---
 name: ag-bootstrap
-description: Bootstrap local projects from in-repo templates through one shared CLI. Use when asked to scaffold a new project or add the standard pre-commit hook to an existing project.
+description: Bootstrap local projects from in-repo templates through one shared CLI. Use when asked to scaffold a new project or add the standard Husky hooks to an existing project.
 ---
 
 # ag-bootstrap
@@ -24,11 +24,11 @@ Use this repo's CLI instead of embedding one-off bootstrap logic in the skill.
 
 ### 3. Post-bootstrap follow-up
 
-- By default, `bin/ag-bootstrap bootstrap ...` writes the standard pre-commit hook, runs `pnpm install`, `pnpm test`, and initializes git when needed.
+- By default, `bin/ag-bootstrap bootstrap ...` writes the standard Husky hooks, runs `pnpm install`, `pnpm test`, and initializes git when needed.
 - If follow-up is skipped, from the generated project run `pnpm install` and `pnpm test`.
 - If no `.git` directory exists yet, run `git init` then `pnpm prepare`.
 
-### 4. Add a pre-commit hook to an existing project
+### 4. Add Husky hooks to an existing project
 
 - Ensure `package.json` exists and defines `lint` and `format` scripts.
 - Run `bin/ag-bootstrap add-precommit [project_root]`.
