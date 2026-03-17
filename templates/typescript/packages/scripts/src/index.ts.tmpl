@@ -1,5 +1,7 @@
+import { formatPackageLabel } from "@{{package_scope}}/common"
+
 const MANAGED_PACKAGES = ["common", "server", "client", "db", "integration", "scripts"] as const
 
 export function listManagedPackages(): string[] {
-  return MANAGED_PACKAGES.map((packageName) => `package:${packageName}`)
+  return MANAGED_PACKAGES.map(formatPackageLabel)
 }

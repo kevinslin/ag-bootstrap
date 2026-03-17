@@ -1,14 +1,8 @@
-import { renderHelloWorld } from "@{{package_scope}}/client"
-import { createConnectionString } from "@{{package_scope}}/db"
-import { buildServerBanner } from "@{{package_scope}}/server"
+import { runSmokeTest } from "../src"
 
 describe("integration", () => {
   it("wires the workspace packages together", () => {
-    expect({
-      client: renderHelloWorld("world"),
-      database: createConnectionString("service"),
-      server: buildServerBanner("world"),
-    }).toEqual({
+    expect(runSmokeTest("world")).toEqual({
       client: "Hello, world!",
       database: "postgres://localhost:5432/service",
       server: "Hello, world! Connected to postgres://localhost:5432/service",

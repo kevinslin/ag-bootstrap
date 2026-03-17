@@ -1,3 +1,6 @@
+import { formatGreeting } from "@{{package_scope}}/common"
+import { createConnectionString } from "@{{package_scope}}/db"
+
 export function buildServerBanner(name: string): string {
-  return `Hello, ${name}! Connected to postgres://localhost:5432/service`
+  return `${formatGreeting(name)} Connected to ${createConnectionString("service")}`
 }

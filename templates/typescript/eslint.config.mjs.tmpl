@@ -5,16 +5,7 @@ import tseslint from "typescript-eslint"
 
 export default tseslint.config(
   {
-    ignores: [
-      "**/*.d.ts",
-      "**/*.d.ts.map",
-      "**/*.js",
-      "**/*.js.map",
-      "**/dist/**",
-      "**/coverage/**",
-      "**/node_modules/**",
-      ".nx/**",
-    ],
+    ignores: ["**/dist/**", "**/coverage/**", "**/node_modules/**", ".nx/**"],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

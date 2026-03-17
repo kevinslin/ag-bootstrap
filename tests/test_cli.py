@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import tempfile
 import unittest
@@ -12,12 +13,18 @@ CLI = REPO_ROOT / "bin" / "ag-bootstrap"
 
 
 class AgBootstrapTest(unittest.TestCase):
-    def run_cli(self, *args: str, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
+    def run_cli(
+        self, *args: str, cwd: Path | None = None, env: dict[str, str] | None = None
+    ) -> subprocess.CompletedProcess[str]:
+        merged_env = os.environ.copy()
+        if env:
+            merged_env.update(env)
         return subprocess.run(
             [str(CLI), *args],
             cwd=cwd or REPO_ROOT,
             check=True,
             capture_output=True,
+            env=merged_env,
             text=True,
         )
 
@@ -33,6 +40,7 @@ class AgBootstrapTest(unittest.TestCase):
             package_json = json.loads((target / "package.json").read_text(encoding="utf-8"))
             self.assertEqual(package_json["name"], "hello-world")
             self.assertEqual(package_json["description"], "Project bootstrapped from ag-bootstrap")
+            self.assertTrue((target / "pnpm-lock.yaml").is_file())
             self.assertTrue((target / "pnpm-workspace.yaml").is_file())
             self.assertTrue((target / "tsconfig.json").is_file())
             self.assertTrue((target / "AGENTS.md").is_file())
@@ -83,6 +91,11 @@ class AgBootstrapTest(unittest.TestCase):
             )
             self.assertEqual(common_package["name"], "@sample-app/common")
 
+            server_source = (target / "packages" / "server" / "src" / "index.ts").read_text(
+                encoding="utf-8"
+            )
+            self.assertIn('from "@sample-app/common"', server_source)
+
     def test_add_precommit_writes_husky_hook(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             target = Path(tmpdir)
@@ -107,6 +120,44 @@ class AgBootstrapTest(unittest.TestCase):
 
             prepush = (target / ".husky" / "pre-push").read_text(encoding="utf-8")
             self.assertIn("pnpm format", prepush)
+
+    def test_bootstrap_runs_followup_with_stubbed_tools(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            target = root / "followup-app"
+            bin_dir = root / "bin"
+            bin_dir.mkdir()
+            command_log = root / "commands.log"
+
+            (bin_dir / "pnpm").write_text(
+                "#!/bin/sh\n"
+                'printf "pnpm %s\\n" "$*" >> "$AG_BOOTSTRAP_LOG"\n',
+                encoding="utf-8",
+            )
+            (bin_dir / "git").write_text(
+                "#!/bin/sh\n"
+                'printf "git %s\\n" "$*" >> "$AG_BOOTSTRAP_LOG"\n'
+                'if [ "$1" = "init" ]; then\n'
+                "  mkdir -p .git\n"
+                "fi\n",
+                encoding="utf-8",
+            )
+            (bin_dir / "pnpm").chmod(0o755)
+            (bin_dir / "git").chmod(0o755)
+
+            env = {
+                "AG_BOOTSTRAP_LOG": str(command_log),
+                "PATH": f"{bin_dir}{os.pathsep}{os.environ['PATH']}",
+            }
+
+            self.run_cli("bootstrap", "typescript", str(target), env=env)
+
+            logged_commands = command_log.read_text(encoding="utf-8")
+            self.assertIn("pnpm install", logged_commands)
+            self.assertIn("pnpm test", logged_commands)
+            self.assertIn("git init", logged_commands)
+            self.assertIn("pnpm prepare", logged_commands)
+            self.assertTrue((target / ".git").is_dir())
 
 
 if __name__ == "__main__":

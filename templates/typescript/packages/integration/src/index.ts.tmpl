@@ -1,3 +1,15 @@
-export function describeIntegrationSuite(): string {
-  return "Run workspace integration checks from packages/integration/test"
+import { renderHelloWorld } from "@{{package_scope}}/client"
+import { createConnectionString } from "@{{package_scope}}/db"
+import { buildServerBanner } from "@{{package_scope}}/server"
+
+export function runSmokeTest(name = "world"): {
+  client: string
+  database: string
+  server: string
+} {
+  return {
+    client: renderHelloWorld(name),
+    database: createConnectionString("service"),
+    server: buildServerBanner(name),
+  }
 }

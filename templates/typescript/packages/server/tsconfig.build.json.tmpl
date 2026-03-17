@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "composite": true,
     "noEmit": false,
     "outDir": "dist",
     "rootDir": "src",
@@ -9,6 +10,10 @@
     "sourceMap": true,
     "tsBuildInfoFile": "tsconfig.tsbuildinfo"
   },
+  "references": [
+    { "path": "../common/tsconfig.build.json" },
+    { "path": "../db/tsconfig.build.json" }
+  ],
   "include": ["src/**/*.ts"],
   "exclude": ["test/**/*.ts", "dist", "coverage", "node_modules"]
 }

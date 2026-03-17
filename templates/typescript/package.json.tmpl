@@ -12,10 +12,10 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "graph": "nx graph",
-    "lint": "nx run-many -t lint --all --parallel=3",
+    "lint": "NX_DAEMON=false nx run-many -t lint --all --parallel=3",
     "list": "lerna list --all",
     "prepare": "husky",
-    "test": "nx run-many -t test --all --parallel=1"
+    "test": "NX_DAEMON=false nx run-many -t test --all --parallel=1"
   },
   "devDependencies": {
     "@eslint/js": "^9.14.0",

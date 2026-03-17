@@ -37,6 +37,7 @@ This template bootstraps a pnpm monorepo managed with Lerna and Nx. It includes:
 ## Commands
 
 - `pnpm build`: build every workspace package through Lerna
+- package builds use TypeScript project references so cross-package imports compile cleanly
 - `pnpm dev`: run package watch tasks in parallel
 - `pnpm clean`: remove build output and Nx cache artifacts
 - `pnpm format`: format the repo with Prettier
